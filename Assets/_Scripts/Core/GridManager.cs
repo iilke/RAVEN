@@ -3,6 +3,8 @@ using UnityEngine;
 public class GridManager : MonoBehaviour
 {
     [Header("Grid Settings")]
+    [Range(0, 5)]
+    public float padding = 0.5f; 
     public int width = 20;  // Number of columns
     public int height = 10; // Number of rows
     public float cellSize = 1.1f; // Spacing between tiles
@@ -48,7 +50,21 @@ public class GridManager : MonoBehaviour
 
     void AdjustCamera()
     {
-        // Centers the main camera based on grid size
-        Camera.main.transform.position = new Vector3((width * cellSize) / 2 - 0.5f, (height * cellSize) / 2 - 0.5f, -10);
+
+        float gridTotalWidth = width * cellSize;
+        float gridTotalHeight = height * cellSize;
+
+        Vector3 centerPos = new Vector3((gridTotalWidth / 2) - (cellSize / 2), (gridTotalHeight / 2) - (cellSize / 2), -10);
+
+        Camera.main.transform.position = centerPos;
+
+        float targetHeight = gridTotalHeight / 2.0f;
+
+        float screenRatio = (float)Screen.width / (float)Screen.height;
+        float targetWidth = (gridTotalWidth / 2.0f) / screenRatio;
+
+        float requiredSize = Mathf.Max(targetHeight, targetWidth);
+
+        Camera.main.orthographicSize = requiredSize + padding;
     }
 }
