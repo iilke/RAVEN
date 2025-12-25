@@ -13,6 +13,25 @@ public class GridManager : MonoBehaviour
     public GameObject tilePrefab;
     public Node[,] grid;
 
+    [Header("Agent & Target")]
+    public GameObject crowPrefab;   
+    public GameObject humanPrefab;
+
+    private Color colorWall = Color.black;
+    private Color colorRoad = Color.white;
+    public Color crowTrailColor = Color.cyan;
+    public Color humanAreaColor = Color.magenta;
+
+    private GameObject activeCrow;
+    private GameObject activeHuman;
+
+    //Algorithm references:
+    public Node startNode;  // Raven
+    public Node targetNode; // Human
+
+    [Header("Fine Tuning Prefab Position")]
+    public Vector3 crowOffset;  
+    public Vector3 humanOffset;
 
     // --- PRESET LEVELS ---
     // 0: TILE, 1: WALL
@@ -26,7 +45,103 @@ public class GridManager : MonoBehaviour
     void Start()
     {
         CreateGrid();      // Empty, all tile grid creation first
-        LoadLevel(1);      // Start with first level
+        LoadLevel(0);      // Start with first level
+
+        // Default fixed positions (left bottom and right top)
+        SetStartNode(0, 0);
+        SetTargetNode(width - 1, height - 1);
+    }
+
+    // --- NODE ASSIGNING FUNCTIONS ---
+
+    public void SetStartNode(int x, int y)
+    {
+        if (!IsCoordinateValid(x, y)) return;
+
+        startNode = grid[x, y];
+        startNode.isWall = false;
+
+        // Color raven's trail
+        startNode.tileRef.GetComponent<SpriteRenderer>().color = crowTrailColor;
+
+        // Move or create object
+        if (activeCrow != null)
+        {
+            activeCrow.transform.position = startNode.worldPosition;
+        }
+        else
+        {
+            activeCrow = Instantiate(crowPrefab, startNode.worldPosition, Quaternion.identity);
+            activeCrow.name = "The Crow";
+        }
+    }
+
+    public void SetTargetNode(int x, int y)
+    {
+        if (!IsCoordinateValid(x, y)) return;
+
+        targetNode = grid[x, y];
+        targetNode.isWall = false;
+
+        // Color target tile
+        targetNode.tileRef.GetComponent<SpriteRenderer>().color = humanAreaColor;
+
+        Vector3 finalPos = targetNode.worldPosition + humanOffset;
+
+        // Move or create object
+        if (activeHuman != null)
+        {
+            activeHuman.transform.position = finalPos;
+        }
+        else
+        {
+            activeHuman = Instantiate(humanPrefab, finalPos, Quaternion.identity);
+            activeHuman.name = "The Target";
+        }
+    }
+
+
+    public void RandomizePositions()
+    {
+        //counter to avoid infinite loops
+        int attempts = 0;
+        int maxAttempts = 100;
+
+        //find a random start that's not a wall
+        int rx, ry;
+        do
+        {
+            rx = Random.Range(0, width);
+            ry = Random.Range(0, height);
+            attempts++;
+        } while (grid[rx, ry].isWall && attempts < maxAttempts);
+
+        SetStartNode(rx, ry);
+
+        //find a random target that's not a wall, not the start
+        attempts = 0;
+        do
+        {
+            rx = Random.Range(0, width);
+            ry = Random.Range(0, height);
+            attempts++;
+        } while ((grid[rx, ry].isWall || grid[rx, ry] == startNode) && attempts < maxAttempts);
+
+        SetTargetNode(rx, ry);
+    }
+
+    // --- HELPERS ---
+
+    void ResetNodeColor(Node node)
+    {
+        // If node is wall, make it black, else white
+        Color targetColor = node.isWall ? colorWall : colorRoad;
+        node.tileRef.GetComponent<SpriteRenderer>().color = targetColor;
+    }
+
+    bool IsCoordinateValid(int x, int y)
+    {
+        return x >= 0 && x < width && y >= 0 && y < height;
     }
 
     // Drawing preset levels with matrices

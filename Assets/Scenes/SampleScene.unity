@@ -249,6 +249,12 @@ MonoBehaviour:
   cellSize: 1.1
   padding: 0.5
   tilePrefab: {fileID: 294371494354851878, guid: dc99036e950b5e14c995200aef72f13c, type: 3}
+  crowPrefab: {fileID: 330072026096399867, guid: c612ff6b6633e3e4881d5675668d8d5a, type: 3}
+  humanPrefab: {fileID: 3253392169314064437, guid: 397d17cec9545824d8e407fefb98b64e, type: 3}
+  crowTrailColor: {r: 0, g: 1, b: 1, a: 1}
+  humanAreaColor: {r: 1, g: 0, b: 1, a: 1}
+  crowOffset: {x: 0, y: 0, z: 0}
+  humanOffset: {x: -0.06, y: -0.48, z: 0}
 --- !u!4 &896027631
 Transform:
   m_ObjectHideFlags: 0
