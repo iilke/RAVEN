@@ -224,6 +224,7 @@ GameObject:
   m_Component:
   - component: {fileID: 896027631}
   - component: {fileID: 896027630}
+  - component: {fileID: 896027632}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -243,10 +244,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 662efc4e6c3848c4ba0defcce7455c31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  padding: 0.5
   width: 20
   height: 10
   cellSize: 1.1
+  padding: 0.5
   tilePrefab: {fileID: 294371494354851878, guid: dc99036e950b5e14c995200aef72f13c, type: 3}
 --- !u!4 &896027631
 Transform:
@@ -263,6 +264,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &896027632
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 896027629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4952483714167074faea71f19123809d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gridManager: {fileID: 896027630}
+  wallColor: {r: 0, g: 0, b: 0, a: 1}
+  floorColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
