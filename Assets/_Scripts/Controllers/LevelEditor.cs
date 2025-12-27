@@ -44,6 +44,12 @@ public class LevelEditor : MonoBehaviour
         {
             Node node = gridManager.grid[x, y];
 
+            if (node == gridManager.startNode || node == gridManager.targetNode) //control: can't change human or raven's positions into wall/tile
+            {
+                return; 
+            }
+            
+
             //Don't do anything if it's already a wall
             if (node.isWall == makeWall) return;
 

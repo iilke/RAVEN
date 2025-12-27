@@ -273,4 +273,55 @@ public class GridManager : MonoBehaviour
         float requiredSize = Mathf.Max(targetHeight, targetWidth);
         Camera.main.orthographicSize = requiredSize + padding;
     }
+
+    public List<Node> GetNeighbors(Node node)
+    {
+        List<Node> neighbors = new List<Node>();
+
+        // 4 directions movement: R, L, U, D
+
+        int[] xDir = { 0, 0, 1, -1 };
+        int[] yDir = { 1, -1, 0, 0 };
+
+        for (int i = 0; i < 4; i++)
+        {
+            int checkX = node.x + xDir[i];
+            int checkY = node.y + yDir[i];
+
+            if (IsCoordinateValid(checkX, checkY))
+            {
+                neighbors.Add(grid[checkX, checkY]);
+            }
+        }
+
+        return neighbors;
+    }
+
+    // GridManager.cs içine ekleyin:
+
+    public void ClearPathfinding()
+    {
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                // reset cost calculations 
+                grid[x, y].gCost = 0;
+                grid[x, y].hCost = 0;
+                grid[x, y].parentNode = null;
+
+                // don't reset walls
+                if (grid[x, y].isWall)
+                {
+                    continue; 
+                }
+
+                //if that tile isn't target or start, make it white to clean traces
+                if (grid[x, y] != startNode && grid[x, y] != targetNode)
+                {
+                    grid[x, y].tileRef.GetComponent<SpriteRenderer>().color = colorRoad;
+                }
+            }
+        }
+    }
 }
