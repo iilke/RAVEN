@@ -6,8 +6,9 @@ using System.Collections;
 public class UIManager : MonoBehaviour
 {
     [Header("UI Groups (States)")]
-    public GameObject panelMainControls; 
-    public GameObject panelExecution;    
+    public GameObject panelExecution;
+    public GameObject groupLoading;      
+    public GameObject groupResult;
 
     [Header("Buttons to Hide")]
     public GameObject btnRun;           
@@ -32,7 +33,7 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI pathCostText;
 
     public static UIManager Instance;
-
+    public bool isInputLocked = false;
     void Awake()
     {
         Instance = this;
@@ -41,8 +42,8 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         UpdateStatus("Ready to search");
-
-        // Dropdown olayýný baðla
+        OnMainPressed();
+        
         if (mapDropdown != null)
             mapDropdown.onValueChanged.AddListener(OnMapChanged);
     }
@@ -50,7 +51,7 @@ public class UIManager : MonoBehaviour
 
     public void OnRunPressed()
     {
-        SetUIState(true);
+        SetUIState_Executing();
 
         gridManager.ClearPathfinding();
 
@@ -79,7 +80,21 @@ public class UIManager : MonoBehaviour
         UpdateStatus("Path Cleared");
     }
 
-  
+    public void OnGameFinished(bool success)
+    {
+        
+        if (groupLoading != null) groupLoading.SetActive(false);
+        if (groupResult != null) groupResult.SetActive(true);
+
+
+        mapDropdown.interactable = false;
+        algoDropdown.interactable = true; 
+
+        if (success) UpdateStatus("Target Found!");
+        else UpdateStatus("Target Unreachable!");
+    }
+
+
     public void OnMapChanged(int index)
     {
         
@@ -96,7 +111,47 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    
+    public void OnRetryPressed()
+    {
+        StartCoroutine(RetrySequence());
+    }
+
+    IEnumerator RetrySequence()
+    {
+        if (groupResult != null) groupResult.SetActive(false);
+
+        if (groupLoading != null) groupLoading.SetActive(true);
+        if (panelExecution != null) panelExecution.SetActive(true);
+
+        gridManager.ClearPathfinding();
+        ResetStats();
+
+        gridManager.ResetCharacterPositions();
+
+        UpdateStatus("Retrying in 2 seconds...");
+        yield return new WaitForSeconds(2.0f);
+
+        OnRunPressed();
+    }
+
+
+    public void OnMainPressed()
+    {
+        gridManager.ResetGrid(); 
+
+        mapDropdown.value = 0;
+        gridManager.LoadLevel(0);
+
+        gridManager.SetStartNode(0, 0);
+
+        gridManager.SetTargetNode(gridManager.width - 1, gridManager.height - 1);
+        
+        ResetStats();
+
+        SetUIState_Main();
+
+        UpdateStatus("Reset to Default");
+    }
     public void OnSelectCrowClicked() { levelEditor.SetMode(1); UpdateStatus("Place Raven"); }
     public void OnRandomCrowClicked() { gridManager.RandomizeCrowPosition(); gridManager.ClearPathfinding(); }
     public void OnSelectHumanClicked() { levelEditor.SetMode(2); UpdateStatus("Place Human"); }
@@ -108,6 +163,13 @@ public class UIManager : MonoBehaviour
         if (visitedText != null) visitedText.text = $"Visited Nodes: {visitedCount}";
         if (pathCostText != null) pathCostText.text = $"Path Cost: {pathLength}";
         if (timeText != null) timeText.text = elapsedMs > 0 ? $"Time Passed: {elapsedMs} ms" : "Time: ...";
+    }
+
+    public void ResetStats()
+    {
+        if (visitedText != null) visitedText.text = "Nodes: 0";
+        if (pathCostText != null) pathCostText.text = "Path: 0";
+        if (timeText != null) timeText.text = "Time: 0 ms";
     }
 
     public void UpdateStatus(string message)
@@ -128,5 +190,40 @@ public class UIManager : MonoBehaviour
 
         
         if (panelExecution != null) panelExecution.SetActive(isRunning);
+    }
+
+    void SetUIState_Executing()
+    {
+        isInputLocked = true; // Duvar çizmeyi engelle
+
+        // Panelleri Aç/Kapa
+        if (panelExecution != null) panelExecution.SetActive(true); // Ýstatistik kutusu açýlýr
+        if (groupLoading != null) groupLoading.SetActive(true);     // Spinner döner
+        if (groupResult != null) groupResult.SetActive(false);      // Sonuç butonlarý gizlenir
+
+        // Ana Butonlarý Gizle
+        if (btnRun != null) btnRun.SetActive(false);
+        if (groupHumanControls != null) groupHumanControls.SetActive(false);
+        if (groupCrowControls != null) groupCrowControls.SetActive(false);
+
+        // Dropdownlarý Kilitle
+        algoDropdown.interactable = false;
+        mapDropdown.interactable = false;
+    }
+
+    void SetUIState_Main()
+    {
+        isInputLocked = false;
+
+        if (panelExecution != null) panelExecution.SetActive(false);
+        if (groupLoading != null) groupLoading.SetActive(false); 
+        if (groupResult != null) groupResult.SetActive(false);   
+
+        if (btnRun != null) btnRun.SetActive(true);
+        if (groupHumanControls != null) groupHumanControls.SetActive(true);
+        if (groupCrowControls != null) groupCrowControls.SetActive(true);
+
+        algoDropdown.interactable = true;
+        mapDropdown.interactable = true;
     }
 }

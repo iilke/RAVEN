@@ -9,6 +9,9 @@ public class LevelEditor : MonoBehaviour
 
     void Update()
     {
+        if (UIManager.Instance != null && UIManager.Instance.isInputLocked) return;
+       
+
         if (gridManager == null || gridManager.grid == null) return;
 
         if (Input.GetMouseButton(0) || Input.GetMouseButton(1))

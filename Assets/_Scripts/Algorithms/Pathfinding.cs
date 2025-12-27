@@ -199,7 +199,30 @@ public class Pathfinding : MonoBehaviour
         if (pathFound) FinishPath(startNode, targetNode, visitedCount, sw.ElapsedMilliseconds);
     }
 
-    
+    void HandleResult(bool success, Node start, Node end, int visitedNodes, long timeMs)
+    {
+        if (success)
+        {
+            List<Node> path = RetracePath(start, end);
+            foreach (Node n in path)
+            {
+                if (n != start && n != end)
+                    n.tileRef.GetComponent<SpriteRenderer>().color = pathColor;
+            }
+
+            if (UIManager.Instance != null)
+                UIManager.Instance.UpdateStats(visitedNodes, path.Count, timeMs);
+
+            StartCoroutine(MoveCrow(path));
+        }
+        else
+        {
+            if (UIManager.Instance != null)
+                UIManager.Instance.OnGameFinished(false);
+        }
+    }
+
+
 
     void FinishPath(Node start, Node end, int visitedNodes, long timeMs)
     {
@@ -255,6 +278,11 @@ public class Pathfinding : MonoBehaviour
                 yield return null;
             }
             crow.transform.position = targetPos;
+        }
+
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.OnGameFinished(true);
         }
     }
 }

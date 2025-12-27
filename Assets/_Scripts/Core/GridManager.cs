@@ -43,18 +43,10 @@ public class GridManager : MonoBehaviour
     void Awake() 
     {
         InitializeLevels();
+        CreateGrid();
     }
 
-    void Start()
-    {
-        CreateGrid();      // Empty, all tile grid creation first
-        LoadLevel(0);      // Start with first level
-
-        // Default fixed positions (left bottom and right top)
-        SetStartNode(0, 0);
-        SetTargetNode(width - 1, height - 1);
-    }
-
+    
     // --- NODE ASSIGNING FUNCTIONS ---
 
     public void SetStartNode(int x, int y)
@@ -221,6 +213,14 @@ public class GridManager : MonoBehaviour
     //Function to call from outside
     public void LoadLevel(int levelIndex)
     {
+        if (predefinedLevels == null || predefinedLevels.Count == 0)
+        {
+            InitializeLevels();
+        }
+
+        if (grid == null) return;
+
+
         if (levelIndex < 0 || levelIndex >= predefinedLevels.Count)
         {
             Debug.LogError("Geçersiz Level ID!");
@@ -259,6 +259,7 @@ public class GridManager : MonoBehaviour
 
     public void ResetGrid()
     {
+        if (grid == null) return;
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
@@ -376,6 +377,19 @@ public class GridManager : MonoBehaviour
                     grid[x, y].tileRef.GetComponent<SpriteRenderer>().color = colorRoad;
                 }
             }
+        }
+    }
+
+    public void ResetCharacterPositions()
+    {
+        if (activeCrow != null && startNode != null)
+        {
+            activeCrow.transform.position = startNode.worldPosition + crowOffset;
+        }
+
+        if (activeHuman != null && targetNode != null)
+        {
+            activeHuman.transform.position = targetNode.worldPosition + humanOffset;
         }
     }
 }
