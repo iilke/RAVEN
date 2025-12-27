@@ -5,14 +5,14 @@ using System.Diagnostics;
 
 public class Pathfinding : MonoBehaviour
 {
-    [Header("Referanslar")]
+    [Header("References")]
     public GridManager gridManager;
 
-    [Header("Ayarlar")]
+    [Header("Settings")]
     public float searchDelay = 0.02f;  
     public float moveSpeed = 5f;
 
-    [Header("Renkler")]
+    [Header("Colors")]
     public Color visitedColor = new Color(1, 0.9f, 0.5f, 0.5f); 
     public Color pathColor = Color.green; 
 

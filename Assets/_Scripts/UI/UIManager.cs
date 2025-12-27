@@ -203,19 +203,16 @@ public class UIManager : MonoBehaviour
 
     void SetUIState_Executing()
     {
-        isInputLocked = true; // Duvar çizmeyi engelle
+        isInputLocked = true; 
 
-        // Panelleri Aç/Kapa
-        if (panelExecution != null) panelExecution.SetActive(true); // Ýstatistik kutusu açýlýr
-        if (groupLoading != null) groupLoading.SetActive(true);     // Spinner döner
-        if (groupResult != null) groupResult.SetActive(false);      // Sonuç butonlarý gizlenir
+        if (panelExecution != null) panelExecution.SetActive(true); 
+        if (groupLoading != null) groupLoading.SetActive(true);     
+        if (groupResult != null) groupResult.SetActive(false);     
 
-        // Ana Butonlarý Gizle
         if (btnRun != null) btnRun.SetActive(false);
         if (groupHumanControls != null) groupHumanControls.SetActive(false);
         if (groupCrowControls != null) groupCrowControls.SetActive(false);
 
-        // Dropdownlarý Kilitle
         algoDropdown.interactable = false;
         mapDropdown.interactable = false;
     }

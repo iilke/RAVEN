@@ -231,9 +231,6 @@ public class GridManager : MonoBehaviour
 
         string[] mapData = predefinedLevels[levelIndex];
 
-        // Harita verisini Grid'e iþle
-        // Not: String array yukarýdan aþaðý (Height-1 -> 0) okunur, ama grid x,y tabanlýdýr.
-        // Bu yüzden döngüde dikkatli olmalýyýz.
 
         for (int y = 0; y < height; y++)
         {
@@ -248,7 +245,6 @@ public class GridManager : MonoBehaviour
                     char tileType = row[x];
                     if (tileType == '1')
                     {
-                        // Duvar Yap
                         grid[x, y].isWall = true;
                         grid[x, y].tileRef.GetComponent<SpriteRenderer>().color = Color.black; 
                     }
@@ -266,7 +262,7 @@ public class GridManager : MonoBehaviour
             {
                 grid[x, y].isWall = false;
                 grid[x, y].tileRef.GetComponent<SpriteRenderer>().color = Color.white; 
-                // Cost reset to be added here
+               
             }
         }
     }
@@ -352,7 +348,6 @@ public class GridManager : MonoBehaviour
         return neighbors;
     }
 
-    // GridManager.cs içine ekleyin:
 
     public void ClearPathfinding()
     {
