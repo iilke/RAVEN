@@ -36,7 +36,7 @@ public class Pathfinding : MonoBehaviour
     }
 
     // BFS (Breadth First Search) ---
-    IEnumerator RunBFS()
+    public IEnumerator RunBFS()
     {
         isRunning = true;
         gridManager.ClearPathfinding(); //Clean previous coloring
@@ -125,7 +125,7 @@ public class Pathfinding : MonoBehaviour
     }
 
 
-    IEnumerator RunDFS()
+    public IEnumerator RunDFS()
     {
         isRunning = true;
         gridManager.ClearPathfinding(); 
@@ -200,7 +200,7 @@ public class Pathfinding : MonoBehaviour
     }
 
 
-    IEnumerator RunAStar()
+    public IEnumerator RunAStar()
     {
         isRunning = true;
         gridManager.ClearPathfinding();

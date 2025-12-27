@@ -61,6 +61,11 @@ public class GridManager : MonoBehaviour
     {
         if (!IsCoordinateValid(x, y)) return;
 
+        if (startNode != null)
+        {
+            startNode.tileRef.GetComponent<SpriteRenderer>().color = colorRoad;
+        }
+
         startNode = grid[x, y];
         startNode.isWall = false;
 
@@ -82,6 +87,11 @@ public class GridManager : MonoBehaviour
     public void SetTargetNode(int x, int y)
     {
         if (!IsCoordinateValid(x, y)) return;
+
+        if (targetNode != null)
+        {
+            targetNode.tileRef.GetComponent<SpriteRenderer>().color = colorRoad;
+        }
 
         targetNode = grid[x, y];
         targetNode.isWall = false;
@@ -260,7 +270,46 @@ public class GridManager : MonoBehaviour
         }
     }
 
+ 
+    public void RandomizeCrowPosition()
+    {
+        int attempts = 0;
+        while (attempts < 100)
+        {
+            int rx = Random.Range(0, width);
+            int ry = Random.Range(0, height);
 
+            Node node = grid[rx, ry];
+
+            
+            if (!node.isWall && node != targetNode)
+            {
+                SetStartNode(rx, ry);
+                break;
+            }
+            attempts++;
+        }
+    }
+
+  
+    public void RandomizeHumanPosition()
+    {
+        int attempts = 0;
+        while (attempts < 100)
+        {
+            int rx = Random.Range(0, width);
+            int ry = Random.Range(0, height);
+
+            Node node = grid[rx, ry];
+
+            if (!node.isWall && node != startNode)
+            {
+                SetTargetNode(rx, ry);
+                break;
+            }
+            attempts++;
+        }
+    }
 
     void AdjustCamera()
     {

@@ -2,60 +2,69 @@ using UnityEngine;
 
 public class LevelEditor : MonoBehaviour
 {
-    [Header("References")]
-    public GridManager gridManager; //Reach Grid
+    public GridManager gridManager;
 
-    [Header("Settings")]
-    public Color wallColor = Color.black;
-    public Color floorColor = Color.white;
+    // 0:wall edit, 1:put raven, 2: put human
+    public int currentMode = 0;
 
     void Update()
     {
-        //Don't do anything if can't acces grid
         if (gridManager == null || gridManager.grid == null) return;
 
-        //Left click: add wall
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0) || Input.GetMouseButton(1))
         {
-            PaintTile(true);
-        }
-        //Right Click: remove wall
-        else if (Input.GetMouseButton(1))
-        {
-            PaintTile(false);
+            HandleInput();
         }
     }
 
-    void PaintTile(bool makeWall)
+    void HandleInput()
     {
-        
+        //mouse position turns into node
         Vector3 mousePos = Input.mousePosition;
-        mousePos.z = 10; 
-
+        mousePos.z = 10;
         Vector3 worldPos = Camera.main.ScreenToWorldPoint(mousePos);
-
-        // GridManager x * cellSize formula used. Reverse of it is division
-        // Mathf.RoundToInt to find closest tile
         int x = Mathf.RoundToInt(worldPos.x / gridManager.cellSize);
         int y = Mathf.RoundToInt(worldPos.y / gridManager.cellSize);
 
-        // check are these indexes in map
+        //border control
         if (x >= 0 && x < gridManager.width && y >= 0 && y < gridManager.height)
         {
-            Node node = gridManager.grid[x, y];
-
-            if (node == gridManager.startNode || node == gridManager.targetNode) //control: can't change human or raven's positions into wall/tile
-            {
-                return; 
-            }
             
+            switch (currentMode)
+            {
+                case 0: //place wall
+                    //can't put wall on raven or human
+                    if (gridManager.grid[x, y] == gridManager.startNode || gridManager.grid[x, y] == gridManager.targetNode) return;
 
-            //Don't do anything if it's already a wall
-            if (node.isWall == makeWall) return;
+                    bool makeWall = Input.GetMouseButton(0);
+                    gridManager.grid[x, y].isWall = makeWall;
+                    gridManager.grid[x, y].tileRef.GetComponent<SpriteRenderer>().color = makeWall ? Color.black : Color.white;
+                    break;
 
-            //Update visually
-            node.isWall = makeWall;
-            node.tileRef.GetComponent<SpriteRenderer>().color = makeWall ? wallColor : floorColor;
+                case 1: //place raven
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        gridManager.SetStartNode(x, y);
+                        currentMode = 0; //go back to wall mode when done
+                        Debug.Log("Raven placed, back to wall mode");
+                    }
+                    break;
+
+                case 2: // Ýnsan Koyma Modu
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        gridManager.SetTargetNode(x, y);
+                        currentMode = 0; 
+                        Debug.Log("Human placed, back to wall mode");
+                    }
+                    break;
+            }
         }
+    }
+
+   
+    public void SetMode(int modeIndex)
+    {
+        currentMode = modeIndex;
     }
 }
