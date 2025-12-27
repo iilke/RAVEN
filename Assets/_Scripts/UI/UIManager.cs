@@ -5,6 +5,15 @@ using System.Collections;
 
 public class UIManager : MonoBehaviour
 {
+    [Header("UI Groups (States)")]
+    public GameObject panelMainControls; 
+    public GameObject panelExecution;    
+
+    [Header("Buttons to Hide")]
+    public GameObject btnRun;           
+    public GameObject groupHumanControls; 
+    public GameObject groupCrowControls;
+
     [Header("Script References")]
     public Pathfinding pathfindingScript;
     public GridManager gridManager;
@@ -41,10 +50,11 @@ public class UIManager : MonoBehaviour
 
     public void OnRunPressed()
     {
+        SetUIState(true);
+
         gridManager.ClearPathfinding();
 
         int selectedAlgo = algoDropdown.value;
-
         switch (selectedAlgo)
         {
             case 0:
@@ -86,7 +96,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    // POZÝSYON BUTONLARI
+    
     public void OnSelectCrowClicked() { levelEditor.SetMode(1); UpdateStatus("Place Raven"); }
     public void OnRandomCrowClicked() { gridManager.RandomizeCrowPosition(); gridManager.ClearPathfinding(); }
     public void OnSelectHumanClicked() { levelEditor.SetMode(2); UpdateStatus("Place Human"); }
@@ -95,13 +105,28 @@ public class UIManager : MonoBehaviour
 
     public void UpdateStats(int visitedCount, int pathLength, long elapsedMs)
     {
-        if (visitedText != null) visitedText.text = $"Nodes: {visitedCount}";
-        if (pathCostText != null) pathCostText.text = $"Path: {pathLength}";
-        if (timeText != null) timeText.text = elapsedMs > 0 ? $"Time: {elapsedMs} ms" : "Time: ...";
+        if (visitedText != null) visitedText.text = $"Visited Nodes: {visitedCount}";
+        if (pathCostText != null) pathCostText.text = $"Path Cost: {pathLength}";
+        if (timeText != null) timeText.text = elapsedMs > 0 ? $"Time Passed: {elapsedMs} ms" : "Time: ...";
     }
 
     public void UpdateStatus(string message)
     {
         if (statusText != null) statusText.text = message;
+    }
+
+    public void SetUIState(bool isRunning)
+    {
+        //Lock Dropdowns
+        algoDropdown.interactable = !isRunning;
+        mapDropdown.interactable = !isRunning;
+
+        //Hide main controls
+        if (btnRun != null) btnRun.SetActive(!isRunning);
+        if (groupHumanControls != null) groupHumanControls.SetActive(!isRunning);
+        if (groupCrowControls != null) groupCrowControls.SetActive(!isRunning);
+
+        
+        if (panelExecution != null) panelExecution.SetActive(isRunning);
     }
 }
