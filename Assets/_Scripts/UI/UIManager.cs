@@ -9,6 +9,7 @@ public class UIManager : MonoBehaviour
     public GameObject panelExecution;
     public GameObject groupLoading;      
     public GameObject groupResult;
+    public TextMeshProUGUI resultMessageText;
 
     [Header("Buttons to Hide")]
     public GameObject btnRun;           
@@ -86,12 +87,20 @@ public class UIManager : MonoBehaviour
         if (groupLoading != null) groupLoading.SetActive(false);
         if (groupResult != null) groupResult.SetActive(true);
 
-
         mapDropdown.interactable = false;
-        algoDropdown.interactable = true; 
+        algoDropdown.interactable = true;
 
-        if (success) UpdateStatus("Target Found!");
-        else UpdateStatus("Target Unreachable!");
+        if (resultMessageText != null)
+        {
+            if (success)
+            {
+                resultMessageText.text = "Finished: Target Found";
+            }
+            else
+            {
+                resultMessageText.text = "Failed: Target Unreachable";
+            }
+        }
     }
 
 

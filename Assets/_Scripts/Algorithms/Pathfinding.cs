@@ -73,7 +73,22 @@ public class Pathfinding : MonoBehaviour
 
         
         sw.Stop();
-        if (pathFound) FinishPath(startNode, targetNode, visitedCount, sw.ElapsedMilliseconds);
+
+        if (pathFound)
+        {
+            FinishPath(startNode, targetNode, visitedCount, sw.ElapsedMilliseconds);
+        }
+        else
+        {
+            UnityEngine.Debug.Log("Target unreachable!");
+
+            if (UIManager.Instance != null)
+            {
+                UIManager.Instance.UpdateStats(visitedCount, 0, sw.ElapsedMilliseconds);
+
+                UIManager.Instance.OnGameFinished(false);
+            }
+        }
     }
 
     
@@ -203,6 +218,7 @@ public class Pathfinding : MonoBehaviour
     {
         if (success)
         {
+            // --- succes ---
             List<Node> path = RetracePath(start, end);
             foreach (Node n in path)
             {
@@ -217,8 +233,15 @@ public class Pathfinding : MonoBehaviour
         }
         else
         {
+            // --- fail ---
+            UnityEngine.Debug.Log("Target not found!"); 
+
             if (UIManager.Instance != null)
+            {
+                UIManager.Instance.UpdateStats(visitedNodes, 0, timeMs);
+
                 UIManager.Instance.OnGameFinished(false);
+            }
         }
     }
 
@@ -269,9 +292,21 @@ public class Pathfinding : MonoBehaviour
         GameObject crow = GameObject.Find("The Crow");
         if (crow == null) yield break;
 
+        SpriteRenderer crowSprite = crow.GetComponent<SpriteRenderer>();
+
         foreach (Node step in path)
         {
             Vector3 targetPos = step.worldPosition + gridManager.crowOffset;
+
+            if (targetPos.x < crow.transform.position.x)
+            {
+                crowSprite.flipX = true; 
+            }
+            else if (targetPos.x > crow.transform.position.x)
+            {
+                crowSprite.flipX = false;
+            }
+
             while (Vector3.Distance(crow.transform.position, targetPos) > 0.05f)
             {
                 crow.transform.position = Vector3.MoveTowards(crow.transform.position, targetPos, moveSpeed * Time.deltaTime);
