@@ -30,6 +30,9 @@ public class Pathfinding : MonoBehaviour
         {
             StartCoroutine(RunDFS());
         }
+
+        //TEST: A for A* srch
+        if (Input.GetKeyDown(KeyCode.A) && !isRunning) StartCoroutine(RunAStar());
     }
 
     // BFS (Breadth First Search) ---
@@ -85,7 +88,7 @@ public class Pathfinding : MonoBehaviour
 
         if (pathFound)
         {
-            Debug.Log("Hedef Bulundu! Yol çiziliyor...");
+            Debug.Log("Target found! Drawing the path now...");
             List<Node> path = RetracePath(startNode, targetNode);
 
             //color the path to green
@@ -100,7 +103,7 @@ public class Pathfinding : MonoBehaviour
         }
         else
         {
-            Debug.Log("Hedefe ulaþýlamýyor!");
+            Debug.Log("Target not found!");
         }
 
         isRunning = false;
@@ -176,7 +179,7 @@ public class Pathfinding : MonoBehaviour
 
         if (pathFound)
         {
-            Debug.Log("DFS Hedefi Buldu!");
+            Debug.Log("Target found! Drawing the path now...");
             List<Node> path = RetracePath(startNode, targetNode);
 
             
@@ -190,9 +193,102 @@ public class Pathfinding : MonoBehaviour
         }
         else
         {
-            Debug.Log("DFS Hedefe Ulaþamadý!");
+            Debug.Log("Target not found!");
         }
 
+        isRunning = false;
+    }
+
+
+    IEnumerator RunAStar()
+    {
+        isRunning = true;
+        gridManager.ClearPathfinding();
+
+        Node startNode = gridManager.startNode;
+        Node targetNode = gridManager.targetNode;
+
+        // For A* "Open List" (to visit) "Closed List" (visited)
+        List<Node> openSet = new List<Node>();
+        HashSet<Node> closedSet = new HashSet<Node>();
+
+        openSet.Add(startNode);
+
+        bool pathFound = false;
+
+        while (openSet.Count > 0)
+        {
+            // 1. Find lowest F cost node inside Openset
+            // Usually with priority queue but using list now
+            Node currentNode = openSet[0];
+            for (int i = 1; i < openSet.Count; i++)
+            {
+                //Choose the lowest F cost one, if F costs are equel choose lowest H cost one.
+                if (openSet[i].FCost < currentNode.FCost ||
+                   (openSet[i].FCost == currentNode.FCost && openSet[i].hCost < currentNode.hCost))
+                {
+                    currentNode = openSet[i];
+                }
+            }
+
+            openSet.Remove(currentNode);
+            closedSet.Add(currentNode);
+
+            //Target found?
+            if (currentNode == targetNode)
+            {
+                pathFound = true;
+                break;
+            }
+
+            //Visualisation
+            if (currentNode != startNode)
+            {
+                currentNode.tileRef.GetComponent<SpriteRenderer>().color = visitedColor;
+            }
+
+            //look at neighbors
+            foreach (Node neighbor in gridManager.GetNeighbors(currentNode))
+            {
+                if (neighbor.isWall || closedSet.Contains(neighbor)) continue;
+
+                //Calculate new cost G: current dis. + 1 
+                int newMovementCostToNeighbor = currentNode.gCost + GetDistance(currentNode, neighbor);
+
+                //If we reached this neighbor with a shorter path or the neighbor isn't already in the list
+                if (newMovementCostToNeighbor < neighbor.gCost || !openSet.Contains(neighbor))
+                {
+                    //update values
+                    neighbor.gCost = newMovementCostToNeighbor;
+                    neighbor.hCost = GetDistance(neighbor, targetNode); //calculate heuristic
+                    neighbor.parentNode = currentNode;
+
+                    if (!openSet.Contains(neighbor))
+                        openSet.Add(neighbor);
+                }
+            }
+
+            //Animation wait
+            yield return new WaitForSeconds(searchDelay);
+        }
+
+        if (pathFound)
+        {
+            Debug.Log("A* found the target!!");
+            List<Node> path = RetracePath(startNode, targetNode);
+
+            foreach (Node n in path)
+            {
+                if (n != startNode && n != targetNode)
+                    n.tileRef.GetComponent<SpriteRenderer>().color = pathColor;
+            }
+
+            yield return StartCoroutine(MoveCrow(path));
+        }
+        else
+        {
+            Debug.Log("Tagret not found!");
+        }
         isRunning = false;
     }
 
@@ -218,5 +314,13 @@ public class Pathfinding : MonoBehaviour
             
             crow.transform.position = targetPos;
         }
+    }
+
+    //Heuristic: Manhattan distance between 2 tiles: (Only horizontal + vertical) like walls doesn't exist.
+    int GetDistance(Node nodeA, Node nodeB)
+    {
+        int dstX = Mathf.Abs(nodeA.x - nodeB.x);
+        int dstY = Mathf.Abs(nodeA.y - nodeB.y);
+        return dstX + dstY;
     }
 }
