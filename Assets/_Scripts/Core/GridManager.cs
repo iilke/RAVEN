@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 public class GridManager : MonoBehaviour
 {
+    [Header("UI Settings")]
+    public float mapOffsetX = -5.0f;
+
     [Header("Grid Settings")]
     public int width = 20;
     public int height = 10;
@@ -147,46 +150,42 @@ public class GridManager : MonoBehaviour
     // Drawing preset levels with matrices
     void InitializeLevels()
     {
-        
+        predefinedLevels.Clear();
         predefinedLevels.Add(new string[] {
-            "00000000000000000000",
-            "00000000000000000000",
-            "00000000000000000000",
-            "00000001111110000000",
-            "00000001111110000000",
-            "00000001111110000000",
-            "00000001111110000000",
-            "00000000000000000000",
-            "00000000000000000000",
-            "00000000000000000000"
+            "000000000000000",
+            "000000000000000",
+            "000000000000000",
+            "000001111100000",
+            "000001111100000",
+            "000001111100000",
+            "000001111100000",
+            "000000000000000",
+            "000000000000000",
+            "000000000000000"
         });
-
-        
         predefinedLevels.Add(new string[] {
-            "00000000000000000000",
-            "11111111111111111100",
-            "00000000000000000000",
-            "00111111111111111111",
-            "00000000000000000000",
-            "11111111111111111100",
-            "00000000000000000000",
-            "00111111111111111111",
-            "00000000000000000000",
-            "00000000000000000000"
+            "000000000000000",
+            "111111111111000",
+            "000000000000000",
+            "000111111111111",
+            "000000000000000",
+            "111111111111000",
+            "000000000000000",
+            "000111111111111",
+            "000000000000000",
+            "000000000000000"
         });
-
-        
         predefinedLevels.Add(new string[] {
-            "00000000000000000000",
-            "00000000000000000000",
-            "00000111111111100000",
-            "00000100000000100000",
-            "00000100000000100000",
-            "00000100000000100000",
-            "00000111111111100000",
-            "00000000000000000000",
-            "00000000000000000000",
-            "00000000000000000000"
+            "000000000000000",
+            "000000000000000",
+            "000011111110000",
+            "000010000010000",
+            "000010000010000",
+            "000010000010000",
+            "000011111110000",
+            "000000000000000",
+            "000000000000000",
+            "000000000000000"
         });
     }
 
@@ -266,7 +265,11 @@ public class GridManager : MonoBehaviour
         float gridTotalWidth = width * cellSize;
         float gridTotalHeight = height * cellSize;
         Vector3 centerPos = new Vector3((gridTotalWidth / 2) - (cellSize / 2), (gridTotalHeight / 2) - (cellSize / 2), -10);
+
+        centerPos.x += mapOffsetX;
+
         Camera.main.transform.position = centerPos;
+
         float targetHeight = gridTotalHeight / 2.0f;
         float screenRatio = (float)Screen.width / (float)Screen.height;
         float targetWidth = (gridTotalWidth / 2.0f) / screenRatio;
