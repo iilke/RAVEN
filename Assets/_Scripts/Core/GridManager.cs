@@ -260,6 +260,8 @@ public class GridManager : MonoBehaviour
         }
     }
 
+
+
     void AdjustCamera()
     {
         float gridTotalWidth = width * cellSize;
