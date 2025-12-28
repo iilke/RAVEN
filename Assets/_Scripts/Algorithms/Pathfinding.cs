@@ -91,7 +91,7 @@ public class Pathfinding : MonoBehaviour
         }
     }
 
-    
+
     public IEnumerator RunDFS()
     {
         Stopwatch sw = new Stopwatch();
@@ -143,10 +143,26 @@ public class Pathfinding : MonoBehaviour
         }
 
         sw.Stop();
-        if (pathFound) FinishPath(startNode, targetNode, visitedCount, sw.ElapsedMilliseconds);
+
+        if (pathFound)
+        {
+            FinishPath(startNode, targetNode, visitedCount, sw.ElapsedMilliseconds);
+        }
+        else
+        {
+            UnityEngine.Debug.Log("Target unreachable!");
+
+            if (UIManager.Instance != null)
+            {
+                UIManager.Instance.UpdateStats(visitedCount, 0, sw.ElapsedMilliseconds);
+
+                UIManager.Instance.OnGameFinished(false);
+            }
+        }
+   
     }
 
-    
+
     public IEnumerator RunAStar()
     {
         Stopwatch sw = new Stopwatch();
@@ -211,7 +227,22 @@ public class Pathfinding : MonoBehaviour
         }
 
         sw.Stop();
-        if (pathFound) FinishPath(startNode, targetNode, visitedCount, sw.ElapsedMilliseconds);
+
+        if (pathFound)
+        {
+            FinishPath(startNode, targetNode, visitedCount, sw.ElapsedMilliseconds);
+        }
+        else
+        {
+            UnityEngine.Debug.Log("Target unreachable!");
+
+            if (UIManager.Instance != null)
+            {
+                UIManager.Instance.UpdateStats(visitedCount, 0, sw.ElapsedMilliseconds);
+                UIManager.Instance.OnGameFinished(false); 
+            }
+        }
+
     }
 
     void HandleResult(bool success, Node start, Node end, int visitedNodes, long timeMs)
